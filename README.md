@@ -1,38 +1,54 @@
 # Загрузчик страниц (JS)
 
 [![hexlet-check](https://github.com/kicha3007-boop/backend-project-4/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/kicha3007-boop/backend-project-4/actions)
+[![CI](https://github.com/kicha3007-boop/backend-project-4/actions/workflows/main.yml/badge.svg)](https://github.com/kicha3007-boop/backend-project-4/actions/workflows/main.yml)
 
-На базовом уровне научитесь работать с асинхронным кодом в JavaScript, писать тесты на Mock / Stub, работать с ошибками и исключениями, DOM, promises, async / await, работать с HTTP.
+`page-loader` скачивает веб-страницу вместе с локальными ресурсами (картинки, стили, скрипты с того же
+хоста) и переписывает ссылки на скачанные файлы — страницу можно открыть без интернета. Ресурсы
+качаются параллельно, прогресс выводится в терминал.
 
-Учебный проект Хекслета: https://ru.hexlet.io/programs/backend
-Как это должно работать: https://asciinema.org/a/dVKok25V5xW2SkjMF4LE8fZOw
+Учебный проект Хекслета: https://ru.hexlet.io/programs/nodejs
 
-## Стек
+## Требования
 
-- JavaScript
+- Node.js 22 или новее
+- npm, make
 
 ## Установка
-
-<!-- Опишите установку: клонирование, зависимости, переменные окружения -->
 
 ```bash
 git clone https://github.com/kicha3007-boop/backend-project-4.git
 cd backend-project-4
+make install
+npm link
 ```
 
-## Использование
+## Запуск
 
-<!-- Добавьте примеры запуска и запись asciinema — именно это смотрит работодатель -->
+```bash
+page-loader --output /var/tmp https://ru.hexlet.io/courses
+# Page was downloaded as '/var/tmp/ru-hexlet-io-courses.html'
+```
 
----
+Страница сохраняется как `ru-hexlet-io-courses.html`, ресурсы — в `ru-hexlet-io-courses_files/`.
+Без `--output` файлы кладутся в текущую директорию. При ошибке (сеть, ответ не 200, нет директории
+или прав) утилита печатает сообщение в stderr и завершается с кодом 1.
 
-<details>
-<summary>Автоматические тесты Хекслета</summary>
+Как библиотека:
 
-Тесты запускаются на каждый коммит. За запуск отвечает файл `.github/workflows/hexlet-check.yml` — не удаляйте и не переименовывайте ни его, ни репозиторий.
+```javascript
+import pageLoader from '@hexlet/code';
 
-</details>
+pageLoader('https://ru.hexlet.io/courses', '/var/tmp').then(({ filepath }) => console.log(filepath));
+```
 
-## О Хекслете
+Отладочный лог: `DEBUG=page-loader page-loader https://ru.hexlet.io/courses`
+(`DEBUG=page-loader,axios,nock.*` — вместе с запросами axios и моками nock в тестах).
 
-[Хекслет](https://ru.hexlet.io/) — школа программирования: авторские программы обучения с практикой, поддержкой наставников и реальными проектами, которые остаются в резюме. Этот репозиторий — один из таких проектов.
+## Разработка
+
+```bash
+make test            # vitest, сеть подменяется nock
+make test-coverage   # тесты с порогом покрытия 90%
+make lint            # oxlint + проверка форматирования oxfmt
+```
